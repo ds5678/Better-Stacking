@@ -23,6 +23,8 @@ namespace BetterStacking
 
         public static void OnLoad()
         {
+            Debug.Log("[Better-Stacking]: Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+
             MakeStackable("GEAR_Accelerant");
             MakeStackable("GEAR_CanOpener");
             MakeStackable("GEAR_FlareA");
