@@ -8,33 +8,37 @@ namespace BetterStacking
     internal class BetterStacking
     {
         private static readonly string[] STACK_MERGE = {
-            "GEAR_WoodMatches",
             "GEAR_Accelerant",
-            "GEAR_PackMatches",
-            "GEAR_WolfPeltDried",
-            "GEAR_RabbitPeltDried",
-            "GEAR_LeatherHideDried",
-            "GEAR_LeatherDried",
-            "GEAR_GutDried",
-            "GEAR_BearHideDried",
             "GEAR_BirchSaplingDried",
-            "GEAR_MapleSaplingDried"
+            "GEAR_BearHideDried",
+            "GEAR_GutDried",
+            "GEAR_LeatherDried",
+            "GEAR_LeatherHideDried",
+            "GEAR_MapleSaplingDried",
+            "GEAR_PackMatches",
+            "GEAR_RabbitPeltDried",
+            "GEAR_WolfPeltDried",
+            "GEAR_WoodMatches",
         };
 
         public static void OnLoad()
         {
             MakeStackable("GEAR_Accelerant");
+            MakeStackable("GEAR_CanOpener");
             MakeStackable("GEAR_FlareA");
+            MakeStackable("GEAR_Hacksaw");
+            MakeStackable("GEAR_Hammer");
+            MakeStackable("GEAR_Hatchet");
+            MakeStackable("GEAR_HatchetImprovised");
+            MakeStackable("GEAR_HighQualityTools");
+            MakeStackable("GEAR_Knife");
+            MakeStackable("GEAR_KnifeImprovised");
+            MakeStackable("GEAR_Prybar");
             MakeStackable("GEAR_SewingKit");
             MakeStackable("GEAR_SimpleTools");
-            MakeStackable("GEAR_HighQualityTools");
-            MakeStackable("GEAR_Prybar");
-            MakeStackable("GEAR_Hammer");
-            MakeStackable("GEAR_Hacksaw");
-            MakeStackable("GEAR_CanOpener");
         }
 
-        internal static void AddToStack(GearItem gearItem)
+        internal static void AddToExistingStack(GearItem gearItem)
         {
             if (gearItem == null || gearItem.m_StackableItem == null)
             {
@@ -61,7 +65,7 @@ namespace BetterStacking
 
                 if (!useDefaultStacking && CanBeMerged(eachTargetItem, gearItem))
                 {
-                    MergeStack(gearItem.GetNormalizedCondition(), 1, eachTargetItem);
+                    MergeIntoStack(gearItem.GetNormalizedCondition(), 1, eachTargetItem);
                     inventory.RemoveGear(gearItem.gameObject);
                     return;
                 }
@@ -89,7 +93,7 @@ namespace BetterStacking
             return default(T);
         }
 
-        internal static void MergeStack(float normalizedCondition, int numUnits, GearItem targetStack)
+        internal static void MergeIntoStack(float normalizedCondition, int numUnits, GearItem targetStack)
         {
             int targetCount = numUnits + targetStack.m_StackableItem.m_Units;
             float targetCondition = (numUnits * normalizedCondition + targetStack.m_StackableItem.m_Units * targetStack.GetNormalizedCondition()) / targetCount;

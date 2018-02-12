@@ -1,8 +1,6 @@
 ﻿using Harmony;
 using UnityEngine;
 
-using NAudio.Wave;
-
 namespace BetterStacking
 {
     [HarmonyPatch(typeof(FlareItem), "Ignite", new System.Type[] { typeof(string) })]
@@ -26,7 +24,7 @@ namespace BetterStacking
     {
         private static void Postfix(GearItem __instance)
         {
-            BetterStacking.AddToStack(__instance);
+            BetterStacking.AddToExistingStack(__instance);
         }
 
         private static void Prefix(GearItem __instance)
@@ -50,7 +48,7 @@ namespace BetterStacking
         private static void Postfix(Lock __instance)
         {
             GearItem m_GearUsedToForceLock = BetterStacking.GetFieldValue<GearItem>(__instance, "m_GearUsedToForceLock");
-            BetterStacking.AddToStack(m_GearUsedToForceLock);
+            BetterStacking.AddToExistingStack(m_GearUsedToForceLock);
         }
 
         private static void Prefix(Lock __instance)
@@ -60,19 +58,35 @@ namespace BetterStacking
         }
     }
 
+    [HarmonyPatch(typeof(Panel_Crafting), "DegradeToolUsedForCrafting")]
+    internal class Panel_Crafting_DegradeToolUsedForCrafting
+    {
+        private static void Postfix(Panel_Crafting __instance)
+        {
+            GearItem gearItem = __instance.GetSelectedTool()?.GetComponent<GearItem>();
+            BetterStacking.AddToExistingStack(gearItem);
+        }
+
+        private static void Prefix(Panel_Crafting __instance)
+        {
+            GearItem gearItem = __instance.GetSelectedTool()?.GetComponent<GearItem>();
+            BetterStacking.SplitStack(gearItem);
+        }
+    }
+
     [HarmonyPatch(typeof(Panel_IceFishingHoleClear), "OnBreakIceComplete")]
     internal class Panel_IceFishingHoleClear_OnBreakIceComplete
     {
         private static void Postfix(Panel_IceFishingHoleClear __instance)
         {
-            GearItem m_GearUsedToForceLock = BetterStacking.GetFieldValue<GearItem>(__instance, "m_ToolUsed");
-            BetterStacking.AddToStack(m_GearUsedToForceLock);
+            GearItem gearItem = BetterStacking.GetFieldValue<GearItem>(__instance, "m_ToolUsed");
+            BetterStacking.AddToExistingStack(gearItem);
         }
 
         private static void Prefix(Panel_IceFishingHoleClear __instance)
         {
-            GearItem m_GearUsedToForceLock = BetterStacking.GetFieldValue<GearItem>(__instance, "m_ToolUsed");
-            BetterStacking.SplitStack(m_GearUsedToForceLock);
+            GearItem gearItem = BetterStacking.GetFieldValue<GearItem>(__instance, "m_ToolUsed");
+            BetterStacking.SplitStack(gearItem);
         }
     }
 
@@ -81,7 +95,7 @@ namespace BetterStacking
     {
         private static void Postfix(Panel_Inventory_Examine __instance)
         {
-            BetterStacking.AddToStack(__instance.m_GearItem);
+            BetterStacking.AddToExistingStack(__instance.m_GearItem);
         }
 
         private static void Prefix(Panel_Inventory_Examine __instance)
@@ -95,7 +109,7 @@ namespace BetterStacking
     {
         private static void Postfix(Panel_Repair __instance)
         {
-            BetterStacking.AddToStack(__instance.m_AutoSelectItem);
+            BetterStacking.AddToExistingStack(__instance.m_AutoSelectItem);
         }
 
         private static void Prefix(Panel_Repair __instance)
@@ -127,7 +141,7 @@ namespace BetterStacking
                 return false;
             }
 
-            BetterStacking.MergeStack(normalizedCondition, numUnits, targetStack);
+            BetterStacking.MergeIntoStack(normalizedCondition, numUnits, targetStack);
             __result = targetStack;
             return false;
         }
