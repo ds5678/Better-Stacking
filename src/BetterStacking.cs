@@ -47,30 +47,14 @@ namespace BetterStacking
                 return;
             }
 
-            bool useDefaultStacking = UseDefaultStacking(gearItem);
-            Inventory inventory = GameManager.GetInventoryComponent();
-
-            GearItem[] targetItems = inventory.GearInInventory(gearItem.name);
-            foreach (GearItem eachTargetItem in targetItems)
+            try
             {
-                if (eachTargetItem == gearItem)
-                {
-                    continue;
-                }
-
-                if (useDefaultStacking && eachTargetItem.GetRoundedCondition() == gearItem.GetRoundedCondition())
-                {
-                    eachTargetItem.m_StackableItem.m_Units++;
-                    inventory.RemoveGear(gearItem.gameObject);
-                    return;
-                }
-
-                if (!useDefaultStacking && CanBeMerged(eachTargetItem, gearItem))
-                {
-                    MergeIntoStack(gearItem.GetNormalizedCondition(), 1, eachTargetItem);
-                    inventory.RemoveGear(gearItem.gameObject);
-                    return;
-                }
+                AddtoExistingStackWithException(gearItem);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+                HUDMessage.AddMessage("[Better-Stacking]: Failed to merge into stack of " + gearItem.name + ".");
             }
         }
 
@@ -111,19 +95,15 @@ namespace BetterStacking
                 return;
             }
 
-            int count = gearItem.m_StackableItem.m_Units;
-            if (count <= 1)
+            try
             {
-                return;
+                SplitStackWithException(gearItem);
             }
-
-            gearItem.m_StackableItem.m_Units = 1;
-
-            GearItem clone = Utils.InstantiateGearFromPrefabName(gearItem.name);
-            clone.m_StackableItem.m_Units = count - 1;
-            clone.m_CurrentHP = gearItem.m_CurrentHP;
-
-            GameManager.GetInventoryComponent().AddGear(clone.gameObject);
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+                HUDMessage.AddMessage("[Better-Stacking]: Failed to split stack of " + gearItem.name + ".");
+            }
         }
 
         internal static bool UseDefaultStacking(GearItem gearItem)
@@ -139,6 +119,35 @@ namespace BetterStacking
             }
 
             return true;
+        }
+
+        private static void AddtoExistingStackWithException(GearItem gearItem)
+        {
+            bool useDefaultStacking = UseDefaultStacking(gearItem);
+            Inventory inventory = GameManager.GetInventoryComponent();
+
+            GearItem[] targetItems = inventory.GearInInventory(gearItem.name);
+            foreach (GearItem eachTargetItem in targetItems)
+            {
+                if (eachTargetItem == gearItem)
+                {
+                    continue;
+                }
+
+                if (useDefaultStacking && eachTargetItem.GetRoundedCondition() == gearItem.GetRoundedCondition())
+                {
+                    eachTargetItem.m_StackableItem.m_Units++;
+                    inventory.RemoveGear(gearItem.gameObject);
+                    return;
+                }
+
+                if (!useDefaultStacking && CanBeMerged(eachTargetItem, gearItem))
+                {
+                    MergeIntoStack(gearItem.GetNormalizedCondition(), 1, eachTargetItem);
+                    inventory.RemoveGear(gearItem.gameObject);
+                    return;
+                }
+            }
         }
 
         private static bool CanBeMerged(FlareItem target, FlareItem item)
@@ -175,6 +184,23 @@ namespace BetterStacking
                 stackableItem.m_Units = 1;
                 stackableItem.m_UnitsPerItem = 1;
             }
+        }
+
+        private static void SplitStackWithException(GearItem gearItem)
+        {
+            int count = gearItem.m_StackableItem.m_Units;
+            if (count <= 1)
+            {
+                return;
+            }
+
+            gearItem.m_StackableItem.m_Units = 1;
+
+            GearItem clone = Utils.InstantiateGearFromPrefabName(gearItem.name);
+            clone.m_StackableItem.m_Units = count - 1;
+            clone.m_CurrentHP = gearItem.m_CurrentHP;
+
+            GameManager.GetInventoryComponent().AddGear(clone.gameObject);
         }
     }
 }

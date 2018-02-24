@@ -104,17 +104,17 @@ namespace BetterStacking
         }
     }
 
-    [HarmonyPatch(typeof(Panel_Repair), "RepairSuccessful")]
-    internal class Panel_Repair_RepairSuccessful
+    [HarmonyPatch(typeof(Panel_Inventory_Examine), "SharpenSuccessful")]
+    internal class Panel_Inventory_Examine_SharpenSuccessful
     {
-        private static void Postfix(Panel_Repair __instance)
+        private static void Postfix(Panel_Inventory_Examine __instance)
         {
-            BetterStacking.AddToExistingStack(__instance.m_AutoSelectItem);
+            BetterStacking.AddToExistingStack(__instance.m_GearItem);
         }
 
-        private static void Prefix(Panel_Repair __instance)
+        private static void Prefix(Panel_Inventory_Examine __instance)
         {
-            BetterStacking.SplitStack(__instance.m_AutoSelectItem);
+            BetterStacking.SplitStack(__instance.m_GearItem);
         }
     }
 
