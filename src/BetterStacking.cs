@@ -162,7 +162,6 @@ namespace BetterStacking
                 return false;
             }
 
-            Debug.Log("target.IsBurnedOut() = " + target.IsBurnedOut() + "; item.IsBurnedOut() = " + item.IsBurnedOut());
             if (target.IsBurnedOut() != item.IsBurnedOut())
             {
                 return false;
