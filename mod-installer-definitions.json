@@ -1,0 +1,10 @@
+﻿[
+	{
+		"name": "Better-Stacking",
+		"version": "2.0.0",
+		"dependencies": [],
+		"assets": [
+			"https://github.com/WulfMarius/Better-Stacking/releases/download/2.0.0-main/Better-Stacking-V2.0.0.zip"
+		]
+	}
+]
