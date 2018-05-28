@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Better-Stacking")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Wulf Marius")]
 [assembly: AssemblyProduct("Better-Stacking")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("© 2018 Wulf Marius")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
