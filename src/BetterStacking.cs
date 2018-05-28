@@ -37,6 +37,7 @@ namespace BetterStacking
             MakeStackable("GEAR_KnifeImprovised");
             MakeStackable("GEAR_Prybar");
             MakeStackable("GEAR_SewingKit");
+            MakeStackable("GEAR_SharpeningStone");
             MakeStackable("GEAR_SimpleTools");
         }
 
