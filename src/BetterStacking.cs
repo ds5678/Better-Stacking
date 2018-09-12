@@ -138,14 +138,14 @@ namespace BetterStacking
                 if (useDefaultStacking && eachTargetItem.GetRoundedCondition() == gearItem.GetRoundedCondition())
                 {
                     eachTargetItem.m_StackableItem.m_Units++;
-                    inventory.RemoveGear(gearItem.gameObject);
+                    inventory.DestroyGear(gearItem.gameObject);
                     return;
                 }
 
                 if (!useDefaultStacking && CanBeMerged(eachTargetItem, gearItem))
                 {
                     MergeIntoStack(gearItem.GetNormalizedCondition(), 1, eachTargetItem);
-                    inventory.RemoveGear(gearItem.gameObject);
+                    inventory.DestroyGear(gearItem.gameObject);
                     return;
                 }
             }
