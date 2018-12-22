@@ -5,8 +5,10 @@ using UnityEngine;
 
 namespace BetterStacking
 {
-    internal class BetterStacking
+    internal class Implementation
     {
+        private const string NAME = "Better-Stacking";
+
         private static readonly string[] STACK_MERGE = {
             "GEAR_Accelerant",
             "GEAR_BirchSaplingDried",
@@ -23,7 +25,8 @@ namespace BetterStacking
 
         public static void OnLoad()
         {
-            Debug.Log("[Better-Stacking]: Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+            Log("Version " + assemblyName.Version);
 
             MakeStackable("GEAR_Accelerant");
             MakeStackable("GEAR_CanOpener");
@@ -54,8 +57,7 @@ namespace BetterStacking
             }
             catch (System.Exception e)
             {
-                Debug.LogException(e);
-                HUDMessage.AddMessage("[Better-Stacking]: Failed to merge into stack of " + gearItem.name + ".");
+                Log("Failed to merge into stack of {0}: {1}.", gearItem.name, e);
             }
         }
 
@@ -80,6 +82,17 @@ namespace BetterStacking
             return default(T);
         }
 
+        internal static void Log(string message)
+        {
+            Debug.LogFormat("[" + NAME + "] {0}", message);
+        }
+
+        internal static void Log(string message, params object[] parameters)
+        {
+            string preformattedMessage = string.Format("[" + NAME + "] {0}", message);
+            Debug.LogFormat(preformattedMessage, parameters);
+        }
+
         internal static void MergeIntoStack(float normalizedCondition, int numUnits, GearItem targetStack)
         {
             int targetCount = numUnits + targetStack.m_StackableItem.m_Units;
@@ -102,8 +115,7 @@ namespace BetterStacking
             }
             catch (System.Exception e)
             {
-                Debug.LogException(e);
-                HUDMessage.AddMessage("[Better-Stacking]: Failed to split stack of " + gearItem.name + ".");
+                Log("Failed to split stack of {0}: {1}.", gearItem.name, e);
             }
         }
 

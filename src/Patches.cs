@@ -14,7 +14,7 @@ namespace BetterStacking
                 return;
             }
 
-            BetterStacking.SplitStack(gearItem);
+            Implementation.SplitStack(gearItem);
             Object.Destroy(gearItem.m_StackableItem);
         }
     }
@@ -24,12 +24,12 @@ namespace BetterStacking
     {
         private static void Postfix(GearItem __instance)
         {
-            BetterStacking.AddToExistingStack(__instance);
+            Implementation.AddToExistingStack(__instance);
         }
 
         private static void Prefix(GearItem __instance)
         {
-            BetterStacking.SplitStack(__instance);
+            Implementation.SplitStack(__instance);
         }
     }
 
@@ -47,14 +47,14 @@ namespace BetterStacking
     {
         private static void Postfix(Lock __instance)
         {
-            GearItem m_GearUsedToForceLock = BetterStacking.GetFieldValue<GearItem>(__instance, "m_GearUsedToForceLock");
-            BetterStacking.AddToExistingStack(m_GearUsedToForceLock);
+            GearItem m_GearUsedToForceLock = Implementation.GetFieldValue<GearItem>(__instance, "m_GearUsedToForceLock");
+            Implementation.AddToExistingStack(m_GearUsedToForceLock);
         }
 
         private static void Prefix(Lock __instance)
         {
-            GearItem m_GearUsedToForceLock = BetterStacking.GetFieldValue<GearItem>(__instance, "m_GearUsedToForceLock");
-            BetterStacking.SplitStack(m_GearUsedToForceLock);
+            GearItem m_GearUsedToForceLock = Implementation.GetFieldValue<GearItem>(__instance, "m_GearUsedToForceLock");
+            Implementation.SplitStack(m_GearUsedToForceLock);
         }
     }
 
@@ -64,13 +64,13 @@ namespace BetterStacking
         private static void Postfix(Panel_Crafting __instance)
         {
             GearItem gearItem = __instance.GetSelectedTool()?.GetComponent<GearItem>();
-            BetterStacking.AddToExistingStack(gearItem);
+            Implementation.AddToExistingStack(gearItem);
         }
 
         private static void Prefix(Panel_Crafting __instance)
         {
             GearItem gearItem = __instance.GetSelectedTool()?.GetComponent<GearItem>();
-            BetterStacking.SplitStack(gearItem);
+            Implementation.SplitStack(gearItem);
         }
     }
 
@@ -79,14 +79,14 @@ namespace BetterStacking
     {
         private static void Postfix(Panel_IceFishingHoleClear __instance)
         {
-            GearItem gearItem = BetterStacking.GetFieldValue<GearItem>(__instance, "m_ToolUsed");
-            BetterStacking.AddToExistingStack(gearItem);
+            GearItem gearItem = Implementation.GetFieldValue<GearItem>(__instance, "m_ToolUsed");
+            Implementation.AddToExistingStack(gearItem);
         }
 
         private static void Prefix(Panel_IceFishingHoleClear __instance)
         {
-            GearItem gearItem = BetterStacking.GetFieldValue<GearItem>(__instance, "m_ToolUsed");
-            BetterStacking.SplitStack(gearItem);
+            GearItem gearItem = Implementation.GetFieldValue<GearItem>(__instance, "m_ToolUsed");
+            Implementation.SplitStack(gearItem);
         }
     }
 
@@ -95,12 +95,12 @@ namespace BetterStacking
     {
         private static void Postfix(Panel_Inventory_Examine __instance)
         {
-            BetterStacking.AddToExistingStack(__instance.m_GearItem);
+            Implementation.AddToExistingStack(__instance.m_GearItem);
         }
 
         private static void Prefix(Panel_Inventory_Examine __instance)
         {
-            BetterStacking.SplitStack(__instance.m_GearItem);
+            Implementation.SplitStack(__instance.m_GearItem);
         }
     }
 
@@ -109,12 +109,12 @@ namespace BetterStacking
     {
         private static void Postfix(Panel_Inventory_Examine __instance)
         {
-            BetterStacking.AddToExistingStack(__instance.m_GearItem);
+            Implementation.AddToExistingStack(__instance.m_GearItem);
         }
 
         private static void Prefix(Panel_Inventory_Examine __instance)
         {
-            BetterStacking.SplitStack(__instance.m_GearItem);
+            Implementation.SplitStack(__instance.m_GearItem);
         }
     }
 
@@ -129,19 +129,19 @@ namespace BetterStacking
                 return false;
             }
 
-            if (BetterStacking.UseDefaultStacking(gearToAdd))
+            if (Implementation.UseDefaultStacking(gearToAdd))
             {
                 return true;
             }
 
             GearItem targetStack = GameManager.GetInventoryComponent().GetClosestMatchStackable(itemName, normalizedCondition);
-            if (!BetterStacking.CanBeMerged(targetStack, gearToAdd))
+            if (!Implementation.CanBeMerged(targetStack, gearToAdd))
             {
                 __result = null;
                 return false;
             }
 
-            BetterStacking.MergeIntoStack(normalizedCondition, numUnits, targetStack);
+            Implementation.MergeIntoStack(normalizedCondition, numUnits, targetStack);
             __result = targetStack;
             return false;
         }
