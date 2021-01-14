@@ -26,8 +26,9 @@ Items that will be stacked even if their condition does not match.
 The condition of the resulting stack will be the overall condition of all items in the stack:
 
 * Matches
-* Dried Pelts
-* Dried Saplings
+* Cured Pelts and Hides
+* Cured Guts
+* Cured Saplings
 
 
 
