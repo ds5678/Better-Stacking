@@ -2,46 +2,47 @@
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using MelonLoader;
 
 namespace BetterStacking
 {
-    internal class Implementation
+    internal class Implementation : MelonMod
     {
         private const string NAME = "Better-Stacking";
 
         private static readonly string[] STACK_MERGE = {
-            "GEAR_Accelerant",
             "GEAR_BirchSaplingDried",
             "GEAR_BearHideDried",
             "GEAR_GutDried",
             "GEAR_LeatherDried",
             "GEAR_LeatherHideDried",
             "GEAR_MapleSaplingDried",
+            "GEAR_MooseHideDried",
             "GEAR_PackMatches",
             "GEAR_RabbitPeltDried",
             "GEAR_WolfPeltDried",
             "GEAR_WoodMatches",
         };
 
-        public static void OnLoad()
+        public override void OnApplicationStart()
         {
-            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
-            Log("Version " + assemblyName.Version);
+            Debug.Log($"[{Info.Name}] Version {Info.Version} loaded!");
 
-            MakeStackable("GEAR_Accelerant");
-            MakeStackable("GEAR_CanOpener");
-            MakeStackable("GEAR_FlareA");
-            MakeStackable("GEAR_Hacksaw");
-            MakeStackable("GEAR_Hammer");
-            MakeStackable("GEAR_Hatchet");
-            MakeStackable("GEAR_HatchetImprovised");
-            MakeStackable("GEAR_HighQualityTools");
-            MakeStackable("GEAR_Knife");
-            MakeStackable("GEAR_KnifeImprovised");
-            MakeStackable("GEAR_Prybar");
-            MakeStackable("GEAR_SewingKit");
-            MakeStackable("GEAR_SharpeningStone");
-            MakeStackable("GEAR_SimpleTools");
+            //MakeStackable("GEAR_Accelerant");
+            //MakeStackable("GEAR_CanOpener");
+            //MakeStackable("GEAR_FlareA");
+            //MakeStackable("GEAR_BlueFlare");
+            //MakeStackable("GEAR_Hacksaw");
+            //MakeStackable("GEAR_Hammer");
+            //MakeStackable("GEAR_Hatchet");
+            //MakeStackable("GEAR_HatchetImprovised");
+            //MakeStackable("GEAR_HighQualityTools");
+            //MakeStackable("GEAR_Knife");
+            //MakeStackable("GEAR_KnifeImprovised");
+            //MakeStackable("GEAR_Prybar");
+            //MakeStackable("GEAR_SewingKit");
+            //MakeStackable("GEAR_SharpeningStone");
+            //MakeStackable("GEAR_SimpleTools");
         }
 
         internal static void AddToExistingStack(GearItem gearItem)
@@ -84,13 +85,13 @@ namespace BetterStacking
 
         internal static void Log(string message)
         {
-            Debug.LogFormat("[" + NAME + "] {0}", message);
+            Debug.Log("[" + NAME + "] :" + message);
         }
 
         internal static void Log(string message, params object[] parameters)
         {
             string preformattedMessage = string.Format("[" + NAME + "] {0}", message);
-            Debug.LogFormat(preformattedMessage, parameters);
+            Debug.Log(preformattedMessage);// Debug.LogFormat(preformattedMessage, parameters);
         }
 
         internal static void MergeIntoStack(float normalizedCondition, int numUnits, GearItem targetStack)
@@ -185,7 +186,7 @@ namespace BetterStacking
 
         private static void MakeStackable(string prefabName)
         {
-            GameObject gameObject = Resources.Load(prefabName) as GameObject;
+            GameObject gameObject = Resources.Load(prefabName).Cast<GameObject>();
 
             StackableItem stackableItem = gameObject.GetComponent<StackableItem>();
             if (stackableItem == null)
