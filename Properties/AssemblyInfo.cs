@@ -24,7 +24,7 @@ using MelonLoader;
 [assembly: Guid("9dd72487-6376-4481-a028-aa2742c023ef")]
 
 
-[assembly: AssemblyVersion("4.0.0")]
-[assembly: AssemblyFileVersion("4.0.0")]
-[assembly: MelonInfo(typeof(BetterStacking.Implementation), "BetterStacking", "4.0", "WulfMarius, ds5678")]
+[assembly: AssemblyVersion("4.1.0")]
+[assembly: AssemblyFileVersion("4.1.0")]
+[assembly: MelonInfo(typeof(BetterStacking.Implementation), "BetterStacking", "4.1.0", "WulfMarius, ds5678")]
 [assembly: MelonGame("Hinterland", "TheLongDark")]

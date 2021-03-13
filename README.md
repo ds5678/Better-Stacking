@@ -29,6 +29,8 @@ The condition of the resulting stack will be the overall condition of all items 
 * Cured Pelts and Hides
 * Cured Guts
 * Cured Saplings
+* Painkillers and Antibiotics
+* Coffee Tins and Herbal Tea Packages
 
 
 

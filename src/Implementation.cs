@@ -8,11 +8,13 @@ namespace BetterStacking
 {
     internal class Implementation : MelonMod
     {
-        private const string NAME = "Better-Stacking";
-
         private static readonly string[] STACK_MERGE = {
             "GEAR_BirchSaplingDried",
             "GEAR_BearHideDried",
+            "GEAR_BottleAntibiotics",
+            "GEAR_BottlePainKillers",
+            "GEAR_CoffeeTin",
+            "GEAR_GreenTeaPackage",
             "GEAR_GutDried",
             "GEAR_LeatherDried",
             "GEAR_LeatherHideDried",
@@ -83,16 +85,9 @@ namespace BetterStacking
             return default(T);
         }
 
-        internal static void Log(string message)
-        {
-            Debug.Log("[" + NAME + "] :" + message);
-        }
+        internal static void Log(string message) => MelonLogger.Log(message);
 
-        internal static void Log(string message, params object[] parameters)
-        {
-            string preformattedMessage = string.Format("[" + NAME + "] {0}", message);
-            Debug.Log(preformattedMessage);// Debug.LogFormat(preformattedMessage, parameters);
-        }
+        internal static void Log(string message, params object[] parameters) => MelonLogger.Log(message, parameters);
 
         internal static void MergeIntoStack(float normalizedCondition, int numUnits, GearItem targetStack)
         {
