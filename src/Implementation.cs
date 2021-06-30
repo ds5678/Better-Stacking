@@ -1,6 +1,4 @@
-﻿using Harmony;
-using System.Linq;
-using System.Reflection;
+﻿using System.Linq;
 using UnityEngine;
 using MelonLoader;
 
@@ -38,18 +36,19 @@ namespace BetterStacking
             //MakeStackable("GEAR_Hammer");
             //MakeStackable("GEAR_Hatchet");
             //MakeStackable("GEAR_HatchetImprovised");
-            //MakeStackable("GEAR_HighQualityTools");
             //MakeStackable("GEAR_Knife");
             //MakeStackable("GEAR_KnifeImprovised");
             //MakeStackable("GEAR_Prybar");
             //MakeStackable("GEAR_SewingKit");
+            //MakeStackable("GEAR_HookAndLine");
             //MakeStackable("GEAR_SharpeningStone");
             //MakeStackable("GEAR_SimpleTools");
+            //MakeStackable("GEAR_HighQualityTools");
         }
 
         internal static void AddToExistingStack(GearItem gearItem)
         {
-            if (gearItem == null || gearItem.m_StackableItem == null)
+            if (gearItem is null || gearItem.m_StackableItem is null)
             {
                 return;
             }
@@ -66,7 +65,7 @@ namespace BetterStacking
 
         internal static bool CanBeMerged(GearItem target, GearItem item)
         {
-            if (target == null || item == null)
+            if (target is null || item is null)
             {
                 return false;
             }
@@ -74,20 +73,8 @@ namespace BetterStacking
             return CanBeMerged(target.m_FlareItem, item.m_FlareItem);
         }
 
-        internal static T GetFieldValue<T>(object target, string fieldName)
-        {
-            FieldInfo fieldInfo = AccessTools.Field(target.GetType(), fieldName);
-            if (fieldInfo != null)
-            {
-                return (T)fieldInfo.GetValue(target);
-            }
-
-            return default(T);
-        }
-
-        internal static void Log(string message) => MelonLogger.Log(message);
-
-        internal static void Log(string message, params object[] parameters) => MelonLogger.Log(message, parameters);
+        internal static void Log(string message) => MelonLogger.Msg(message);
+        internal static void Log(string message, params object[] parameters) => MelonLogger.Msg(message, parameters);
 
         internal static void MergeIntoStack(float normalizedCondition, int numUnits, GearItem targetStack)
         {
@@ -100,7 +87,7 @@ namespace BetterStacking
 
         internal static void SplitStack(GearItem gearItem)
         {
-            if (gearItem == null || gearItem.m_StackableItem == null)
+            if (gearItem is null || gearItem.m_StackableItem is null)
             {
                 return;
             }
@@ -117,7 +104,7 @@ namespace BetterStacking
 
         internal static bool UseDefaultStacking(GearItem gearItem)
         {
-            if (gearItem == null)
+            if (gearItem is null)
             {
                 return true;
             }
@@ -161,7 +148,7 @@ namespace BetterStacking
 
         private static bool CanBeMerged(FlareItem target, FlareItem item)
         {
-            if (target == null || item == null)
+            if (target is null || item is null)
             {
                 return true;
             }
@@ -184,7 +171,7 @@ namespace BetterStacking
             GameObject gameObject = Resources.Load(prefabName).Cast<GameObject>();
 
             StackableItem stackableItem = gameObject.GetComponent<StackableItem>();
-            if (stackableItem == null)
+            if (stackableItem is null)
             {
                 stackableItem = gameObject.AddComponent<StackableItem>();
                 stackableItem.m_ShareStackWithGear = new StackableItem[0];

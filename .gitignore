@@ -1,3 +1,5 @@
 bin
 obj
 Better-Stacking.csproj.user
+.vs
+.suo
