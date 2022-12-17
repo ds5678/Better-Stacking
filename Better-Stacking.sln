@@ -1,9 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Better-Stacking", "Better-Stacking.csproj", "{9DD72487-6376-4481-A028-AA2742C023EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Better-Stacking", "BetterStacking\Better-Stacking.csproj", "{2874F1CE-7E21-433E-B879-226C12D3EE46}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{59DB098B-2CAA-422D-B4CD-4B20A6F2EC08}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +18,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9DD72487-6376-4481-A028-AA2742C023EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9DD72487-6376-4481-A028-AA2742C023EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9DD72487-6376-4481-A028-AA2742C023EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9DD72487-6376-4481-A028-AA2742C023EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2874F1CE-7E21-433E-B879-226C12D3EE46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2874F1CE-7E21-433E-B879-226C12D3EE46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2874F1CE-7E21-433E-B879-226C12D3EE46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2874F1CE-7E21-433E-B879-226C12D3EE46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

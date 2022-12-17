@@ -3,9 +3,6 @@ using System.Runtime.InteropServices;
 using MelonLoader;
 using BuildInfo = BetterStacking.BuildInfo;
 
-[assembly: ComVisible(false)]
-[assembly: Guid("9dd72487-6376-4481-a028-aa2742c023ef")]
-
 [assembly: AssemblyTitle(BuildInfo.Name)]
 [assembly: AssemblyDescription(BuildInfo.Description)]
 [assembly: AssemblyCompany(BuildInfo.Company)]
