@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using Il2Cpp;
 using UnityEngine;
 
 namespace BetterStacking
@@ -113,7 +112,7 @@ namespace BetterStacking
             }
         }*/
 
-        [HarmonyPatch(typeof(PlayerManager), nameof(PlayerManager.AddToExistingStackable), new System.Type[] { typeof(string), typeof(float), typeof(int), typeof(GearItem) })]
+        [HarmonyPatch(typeof(PlayerManager), "AddToExistingStackable", new System.Type[] { typeof(string), typeof(float), typeof(int), typeof(GearItem) })]
         internal class PlayerManager_AddToExistingStackable
         {
             private static bool Prefix(PlayerManager __instance, ref GearItem __result, string itemName, float normalizedCondition, int numUnits, GearItem gearToAdd)

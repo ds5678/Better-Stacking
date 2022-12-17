@@ -1,13 +1,13 @@
-﻿using Il2Cpp;
-using MelonLoader;
+﻿using System.Linq;
 using UnityEngine;
+using MelonLoader;
+using Il2Cpp;
 
 namespace BetterStacking;
 
 internal class Implementation : MelonMod
 {
-    private static readonly string[] STACK_MERGE =
-    {
+    private static readonly string[] STACK_MERGE = {
         "GEAR_BirchSaplingDried",
         "GEAR_BearHideDried",
         "GEAR_BottleAntibiotics",
@@ -49,7 +49,7 @@ internal class Implementation : MelonMod
 
     internal static void AddToExistingStack(GearItem gearItem)
     {
-        if (gearItem == null || gearItem.m_StackableItem == null)
+        if (gearItem is null || gearItem.m_StackableItem is null)
         {
             return;
         }
@@ -66,7 +66,12 @@ internal class Implementation : MelonMod
 
     internal static bool CanBeMerged(GearItem target, GearItem item)
     {
-        return target != null && item != null && CanBeMerged(target.m_FlareItem, item.m_FlareItem);
+        if (target is null || item is null)
+        {
+            return false;
+        }
+
+        return CanBeMerged(target.m_FlareItem, item.m_FlareItem);
     }
 
     internal static void Log(string message) => MelonLogger.Msg(message);
@@ -83,7 +88,7 @@ internal class Implementation : MelonMod
 
     internal static void SplitStack(GearItem gearItem)
     {
-        if (gearItem == null || gearItem.m_StackableItem == null)
+        if (gearItem is null || gearItem.m_StackableItem is null)
         {
             return;
         }
@@ -100,7 +105,17 @@ internal class Implementation : MelonMod
 
     internal static bool UseDefaultStacking(GearItem gearItem)
     {
-        return gearItem == null || !STACK_MERGE.Contains(gearItem.name);
+        if (gearItem is null)
+        {
+            return true;
+        }
+
+        if (STACK_MERGE.Contains(gearItem.name))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private static void AddtoExistingStackWithException(GearItem gearItem)
@@ -134,7 +149,7 @@ internal class Implementation : MelonMod
 
     private static bool CanBeMerged(FlareItem target, FlareItem item)
     {
-        if (target == null || item == null)
+        if (target is null || item is null)
         {
             return true;
         }
@@ -157,10 +172,10 @@ internal class Implementation : MelonMod
         GameObject gameObject = Resources.Load(prefabName).Cast<GameObject>();
 
         StackableItem stackableItem = gameObject.GetComponent<StackableItem>();
-        if (stackableItem == null)
+        if (stackableItem is null)
         {
             stackableItem = gameObject.AddComponent<StackableItem>();
-            stackableItem.m_ShareStackWithGear = Array.Empty<StackableItem>();
+            stackableItem.m_ShareStackWithGear = new StackableItem[0];
             stackableItem.m_StackSpriteName = string.Empty;
             stackableItem.m_Units = 1;
             stackableItem.m_UnitsPerItem = 1;
