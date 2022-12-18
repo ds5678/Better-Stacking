@@ -79,6 +79,9 @@ internal class Implementation : MelonMod
 
     internal static void MergeIntoStack(float normalizedCondition, int numUnits, GearItem targetStack)
     {
+
+        //MelonLogger.Msg("Merging.. | " + targetStack.name + " | " + normalizedCondition + " | " + numUnits);
+
         int targetCount = numUnits + targetStack.m_StackableItem.m_Units;
         float targetCondition = (numUnits * normalizedCondition + targetStack.m_StackableItem.m_Units * targetStack.GetNormalizedCondition()) / targetCount;
 
@@ -123,9 +126,17 @@ internal class Implementation : MelonMod
         bool useDefaultStacking = UseDefaultStacking(gearItem);
         Inventory inventory = GameManager.GetInventoryComponent();
 
-        GearItem[] targetItems = inventory.GearInInventory(gearItem.name);
+
+//        GearItem[] targetItems = inventory.GearInInventory(gearItem.name);
+        GearItem[] targetItems = PlayerManager.FindObjectsOfType<GearItem>();
         foreach (GearItem eachTargetItem in targetItems)
         {
+
+            if (eachTargetItem.GetType != gearItem.GetType)
+            {
+                continue;
+            }
+
             if (eachTargetItem == gearItem)
             {
                 continue;
