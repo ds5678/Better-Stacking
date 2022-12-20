@@ -47,22 +47,22 @@ internal class Implementation : MelonMod
         //MakeStackable("GEAR_HighQualityTools");
     }
 
-    internal static void AddToExistingStack(GearItem gearItem)
-    {
-        if (gearItem is null || gearItem.m_StackableItem is null)
-        {
-            return;
-        }
+    //internal static void AddToExistingStack(GearItem gearItem)
+    //{
+    //    if (gearItem is null || gearItem.m_StackableItem is null)
+    //    {
+    //        return;
+    //    }
 
-        try
-        {
-            AddtoExistingStackWithException(gearItem);
-        }
-        catch (System.Exception e)
-        {
-            Log("Failed to merge into stack of {0}: {1}.", gearItem.name, e);
-        }
-    }
+    //    try
+    //    {
+    //        AddtoExistingStackWithException(gearItem);
+    //    }
+    //    catch (System.Exception e)
+    //    {
+    //        Log("Failed to merge into stack of {0}: {1}.", gearItem.name, e);
+    //    }
+    //}
 
     internal static bool CanBeMerged(GearItem target, GearItem item)
     {
@@ -77,16 +77,43 @@ internal class Implementation : MelonMod
     internal static void Log(string message) => MelonLogger.Msg(message);
     internal static void Log(string message, params object[] parameters) => MelonLogger.Msg(message, parameters);
 
-    internal static void MergeIntoStack(float normalizedCondition, int numUnits, GearItem targetStack)
+    internal static void MergeIntoStack(float normalizedCondition, int numUnits, GearItem targetStack, GearItem gearToAdd)
     {
-
-        //MelonLogger.Msg("Merging.. | " + targetStack.name + " | " + normalizedCondition + " | " + numUnits);
 
         int targetCount = numUnits + targetStack.m_StackableItem.m_Units;
         float targetCondition = (numUnits * normalizedCondition + targetStack.m_StackableItem.m_Units * targetStack.GetNormalizedCondition()) / targetCount;
 
-        targetStack.m_StackableItem.m_Units = targetCount;
+        // track the old constraint
+        float oldConstraint = targetStack.m_StackableItem.m_StackConditionDifferenceConstraint;
+        /*
+         convince the game logic these stacks can merge between 0% -> 100% condition
+         the game keeps the existing stack condition %
+        */
+        targetStack.m_StackableItem.m_StackConditionDifferenceConstraint = 100f;
+        gearToAdd.m_StackableItem.m_StackConditionDifferenceConstraint = 100f;
+
+        /*
+         NOTE : Items added via console had a normalizedCondition = 1, so will increase targetStack condition %
+        */
+
+        // change the target stack to the new calculated condition
         targetStack.CurrentHP = targetCondition * targetStack.m_GearItemData.m_MaxHP;
+
+        /*
+         restore the constraint to avoid conflict with other game logic
+         Didn't work when restoring this as calling method "InstantiateItemInPlayerInventory" is clearly adding the item regardless of this methods return value
+         not sure if this will cause any long term issues with game logic
+         Could possible add this to a Postfix method, though would probably have to be Postfix(PlayerManager.InstantiateItemInPlayerInventory)
+        */
+        //targetStack.m_StackableItem.m_StackConditionDifferenceConstraint = oldConstraint;
+        //gearToAdd.m_StackableItem.m_StackConditionDifferenceConstraint = oldConstraint;
+
+        /*
+         force a manual update on both gearItem objects just incase it matters.
+        worked without, could remove if required or causes issues.
+        */
+        targetStack.ManualUpdate();
+        gearToAdd.ManualUpdate();
     }
 
     internal static void SplitStack(GearItem gearItem)
@@ -121,42 +148,42 @@ internal class Implementation : MelonMod
         return true;
     }
 
-    private static void AddtoExistingStackWithException(GearItem gearItem)
-    {
-        bool useDefaultStacking = UseDefaultStacking(gearItem);
-        Inventory inventory = GameManager.GetInventoryComponent();
+//    private static void AddtoExistingStackWithException(GearItem gearItem)
+//    {
+//        bool useDefaultStacking = UseDefaultStacking(gearItem);
+//        Inventory inventory = GameManager.GetInventoryComponent();
 
 
-//        GearItem[] targetItems = inventory.GearInInventory(gearItem.name);
-        GearItem[] targetItems = PlayerManager.FindObjectsOfType<GearItem>();
-        foreach (GearItem eachTargetItem in targetItems)
-        {
+////        GearItem[] targetItems = inventory.GearInInventory(gearItem.name);
+//        GearItem[] targetItems = PlayerManager.FindObjectsOfType<GearItem>();
+//        foreach (GearItem eachTargetItem in targetItems)
+//        {
 
-            if (eachTargetItem.GetType != gearItem.GetType)
-            {
-                continue;
-            }
+//            if (eachTargetItem.GetType != gearItem.GetType)
+//            {
+//                continue;
+//            }
 
-            if (eachTargetItem == gearItem)
-            {
-                continue;
-            }
+//            if (eachTargetItem == gearItem)
+//            {
+//                continue;
+//            }
 
-            if (useDefaultStacking && eachTargetItem.GetRoundedCondition() == gearItem.GetRoundedCondition())
-            {
-                eachTargetItem.m_StackableItem.m_Units++;
-                inventory.DestroyGear(gearItem.gameObject);
-                return;
-            }
+//            if (useDefaultStacking && eachTargetItem.GetRoundedCondition() == gearItem.GetRoundedCondition())
+//            {
+//                eachTargetItem.m_StackableItem.m_Units++;
+//                inventory.DestroyGear(gearItem.gameObject);
+//                return;
+//            }
 
-            if (!useDefaultStacking && CanBeMerged(eachTargetItem, gearItem))
-            {
-                MergeIntoStack(gearItem.GetNormalizedCondition(), 1, eachTargetItem);
-                inventory.DestroyGear(gearItem.gameObject);
-                return;
-            }
-        }
-    }
+//            if (!useDefaultStacking && CanBeMerged(eachTargetItem, gearItem))
+//            {
+//                MergeIntoStack(gearItem.GetNormalizedCondition(), 1, eachTargetItem);
+//                inventory.DestroyGear(gearItem.gameObject);
+//                return;
+//            }
+//        }
+//    }
 
     private static bool CanBeMerged(FlareItem target, FlareItem item)
     {
@@ -178,20 +205,20 @@ internal class Implementation : MelonMod
         return true;
     }
 
-    private static void MakeStackable(string prefabName)
-    {
-        GameObject gameObject = Resources.Load(prefabName).Cast<GameObject>();
+    //private static void MakeStackable(string prefabName)
+    //{
+    //    GameObject gameObject = Resources.Load(prefabName).Cast<GameObject>();
 
-        StackableItem stackableItem = gameObject.GetComponent<StackableItem>();
-        if (stackableItem is null)
-        {
-            stackableItem = gameObject.AddComponent<StackableItem>();
-            stackableItem.m_ShareStackWithGear = new StackableItem[0];
-            stackableItem.m_StackSpriteName = string.Empty;
-            stackableItem.m_Units = 1;
-            stackableItem.m_UnitsPerItem = 1;
-        }
-    }
+    //    StackableItem stackableItem = gameObject.GetComponent<StackableItem>();
+    //    if (stackableItem is null)
+    //    {
+    //        stackableItem = gameObject.AddComponent<StackableItem>();
+    //        stackableItem.m_ShareStackWithGear = new StackableItem[0];
+    //        stackableItem.m_StackSpriteName = string.Empty;
+    //        stackableItem.m_Units = 1;
+    //        stackableItem.m_UnitsPerItem = 1;
+    //    }
+    //}
 
     private static void SplitStackWithException(GearItem gearItem)
     {
