@@ -1,19 +1,18 @@
 ﻿using HarmonyLib;
-using UnityEngine;
 using Il2Cpp;
-using System.Reflection;
 using MelonLoader;
+using System.Reflection;
 namespace BetterStacking
 {
 
     internal static class Patches
     {
 
-        internal static bool postfix_track = false;
-        internal static float postfix_condition = 0;
-        internal static GearItem postfix_stack = new GearItem();
-        internal static GearItem postfix_geartoadd = new GearItem();
-        internal static float postfix_constraint = 0;
+        internal static bool PostFixTrack { get; set; } = false ;
+        internal static float PostfixCondition { get; set; }  = 0;
+        internal static GearItem? PostfixStack { get; set; }  = null;
+        internal static GearItem? PostfixGearToAdd { get; set; }  = null;
+        internal static float PostfixConstraint { get; set; }  = 0;
 
         [HarmonyPatch]
         internal static class PlayerManager_TryAddToExistingStackable
@@ -28,7 +27,7 @@ namespace BetterStacking
                         return m;
                     }
                 }
-                MelonLogger.Msg("PlayerManager.TryAddToExistingStackable not found for patch.");
+                MelonLogger.Warning("PlayerManager.TryAddToExistingStackable not found for patch.");
                 return null;
             }
             internal static bool Prefix(ref GearItem gearToAdd, float normalizedCondition, int numUnits, out GearItem existingGearItem)
@@ -48,7 +47,7 @@ namespace BetterStacking
 
                 GearItem targetStack = GameManager.GetInventoryComponent().GetClosestMatchStackable(gearToAdd.GearItemData, normalizedCondition);
 
-                if (!Implementation.CanBeMerged(targetStack, gearToAdd))
+                if (!CanBeMerged(targetStack, gearToAdd))
                 {
                     return false;
                 }
@@ -72,26 +71,56 @@ namespace BetterStacking
             private static void Postfix()
             {
                 // are we tracking a postfix patch ?
-                if (postfix_track)
+                if (PostFixTrack)
                 {
                     // correct the stack(s) conditions
-                    postfix_stack.CurrentHP = postfix_condition * postfix_stack.m_GearItemData.m_MaxHP;
-                    postfix_geartoadd.CurrentHP = postfix_condition * postfix_geartoadd.m_GearItemData.m_MaxHP;
+                    PostfixStack.CurrentHP = PostfixCondition * PostfixStack.m_GearItemData.m_MaxHP;
+                    PostfixGearToAdd.CurrentHP = PostfixCondition * PostfixGearToAdd.m_GearItemData.m_MaxHP;
 
                     // reset the items constraints
-                    postfix_stack.m_StackableItem.m_StackConditionDifferenceConstraint = postfix_constraint;
-                    postfix_geartoadd.m_StackableItem.m_StackConditionDifferenceConstraint = postfix_constraint;
+                    PostfixStack.m_StackableItem.m_StackConditionDifferenceConstraint = PostfixConstraint;
+                    PostfixGearToAdd.m_StackableItem.m_StackConditionDifferenceConstraint = PostfixConstraint;
 
                 }
 
                 // reset the static values to avoid any conflicts
-                postfix_track = false;
-                postfix_condition = 0;
-                postfix_stack = new GearItem();
-                postfix_geartoadd = new GearItem();
-                postfix_constraint = 0;
+                ResetPostfixParams();
 
             }
+        }
+
+        internal static bool CanBeMerged(GearItem target, GearItem item)
+        {
+            return target != null && item != null && CanBeMerged(target.m_FlareItem, item.m_FlareItem);
+        }
+
+        private static bool CanBeMerged(FlareItem target, FlareItem item)
+        {
+            if (target == null || item == null)
+            {
+                return true;
+            }
+
+            if (target.IsBurning() || item.IsBurning())
+            {
+                return false;
+            }
+
+            if (target.IsBurnedOut() != item.IsBurnedOut())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        internal static void ResetPostfixParams()
+        {
+            PostFixTrack = false;
+            PostfixCondition = 0;
+            PostfixStack = null;
+            PostfixGearToAdd = null;
+            PostfixConstraint = 0;
         }
 
     }

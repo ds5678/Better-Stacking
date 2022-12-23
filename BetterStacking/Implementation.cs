@@ -1,14 +1,14 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using Il2Cpp;
 using MelonLoader;
-using Il2Cpp;
+using UnityEngine;
 namespace BetterStacking;
 
 
 
 internal class Implementation : MelonMod
 {
-    private static readonly string[] STACK_MERGE = {
+    private static readonly string[] STACK_MERGE =
+    {
         "GEAR_BirchSaplingDried",
         "GEAR_BearHideDried",
         "GEAR_BottleAntibiotics",
@@ -48,23 +48,19 @@ internal class Implementation : MelonMod
         //MakeStackable("GEAR_HighQualityTools");
     }
 
- 
-    internal static bool CanBeMerged(GearItem target, GearItem item)
-    {
-        return target != null && item != null && CanBeMerged(target.m_FlareItem, item.m_FlareItem);
-    }
 
-    internal static void Log(string message) => MelonLogger.Msg(message);
-    internal static void Log(string message, params object[] parameters) => MelonLogger.Msg(message, parameters);
 
 
     internal static void MergeIntoStack(float normalizedCondition, int numUnits, GearItem targetStack, GearItem gearToAdd)
     {
 
         // check for console added items
-        // condition is always 1 as this gets changed later even when specified
-        if (normalizedCondition == 1 && uConsole.IsOn())
+        if (uConsole.IsOn())
         {
+
+            // normalizedCondition is always 1 here when added via console, this gets changed later in CONSOLE_gear_add
+            // so we recalculate it from the console params (or game logic) to be used in the below calculations
+
             // NO condition specified (only 2 params)
             if (uConsole.GetNumParameters() == 2)
             {
@@ -76,8 +72,8 @@ internal class Implementation : MelonMod
             // condition WAS specified (3rd param)
             if (uConsole.GetNumParameters() == 3)
             {
-                // set the postfix_track to enable the CONSOLE_gear_add.postfix logic
-                Patches.postfix_track = true;
+                // set the PostFixTrack to enable the CONSOLE_gear_add.postfix logic
+                Patches.PostFixTrack = true;
                 // calc condition based on console params
                 float consoleCondition = Mathf.Clamp(float.Parse(uConsole.m_Argv[3]), 0, 100) / 100f;
                 // apply the new condition and override normalizedCondition with the new value
@@ -85,26 +81,24 @@ internal class Implementation : MelonMod
                 normalizedCondition = gearToAdd.GetNormalizedCondition();
 
             }
-            
+
         }
 
         int targetCount = numUnits + targetStack.m_StackableItem.m_Units;
         float targetCondition = (numUnits * normalizedCondition + targetStack.m_StackableItem.m_Units * targetStack.GetNormalizedCondition()) / targetCount;
 
         // set static variables for the postfox patch
-        if (Patches.postfix_track == true)
+        if (Patches.PostFixTrack == true)
         {
-            Patches.postfix_condition = targetCondition;
-            Patches.postfix_stack = targetStack;
-            Patches.postfix_geartoadd = gearToAdd;
-            Patches.postfix_constraint = targetStack.m_StackableItem.m_StackConditionDifferenceConstraint;
+            Patches.PostfixCondition = targetCondition;
+            Patches.PostfixStack = targetStack;
+            Patches.PostfixGearToAdd = gearToAdd;
+            Patches.PostfixConstraint = targetStack.m_StackableItem.m_StackConditionDifferenceConstraint;
         }
 
-        /*
-         convince the game logic these stacks can merge between 0% -> 100% condition
-         the game keeps the existing stack condition %
-        (avoids having to destroy anything, just let the game do it all)
-        */
+        // convince the game logic these stacks can merge between 0% -> 100% condition
+        // the game keeps the existing stack condition %
+        // (avoids having to destroy anything, we let the game do it all)
         targetStack.m_StackableItem.m_StackConditionDifferenceConstraint = 100f;
         gearToAdd.m_StackableItem.m_StackConditionDifferenceConstraint = 100f;
 
@@ -126,7 +120,7 @@ internal class Implementation : MelonMod
         }
         catch (System.Exception e)
         {
-            Log("Failed to split stack of {0}: {1}.", gearItem.name, e);
+            MelonLogger.Warning("Failed to split stack of {0}: {1}.", gearItem.name, e);
         }
     }
 
@@ -136,25 +130,7 @@ internal class Implementation : MelonMod
     }
 
 
-    private static bool CanBeMerged(FlareItem target, FlareItem item)
-    {
-        if (target == null || item == null)
-        {
-            return true;
-        }
 
-        if (target.IsBurning() || item.IsBurning())
-        {
-            return false;
-        }
-
-        if (target.IsBurnedOut() != item.IsBurnedOut())
-        {
-            return false;
-        }
-
-        return true;
-    }
 
     private static void SplitStackWithException(GearItem gearItem)
     {
