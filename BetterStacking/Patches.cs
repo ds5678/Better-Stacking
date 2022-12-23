@@ -1,125 +1,43 @@
 ﻿using HarmonyLib;
 using UnityEngine;
-
+using Il2Cpp;
+using System.Reflection;
+using MelonLoader;
 namespace BetterStacking
 {
+
     internal static class Patches
     {
-        /*[HarmonyPatch(typeof(FlareItem), "Ignite", new System.Type[] { typeof(string) })]
-        internal class FlareItem_Ignite
+
+        internal static bool postfix_track = false;
+        internal static float postfix_condition = 0;
+        internal static GearItem postfix_stack = new GearItem();
+        internal static GearItem postfix_geartoadd = new GearItem();
+        internal static float postfix_constraint = 0;
+
+        [HarmonyPatch]
+        internal static class PlayerManager_TryAddToExistingStackable
         {
-            private static void Postfix(FlareItem __instance)
+            static MethodBase? TargetMethod()
             {
-                GearItem gearItem = __instance.GetComponent<GearItem>();
-                if (gearItem is null || gearItem.m_StackableItem is null)
+                MethodInfo[] methods = typeof(PlayerManager).GetMethods();
+                foreach (MethodInfo m in methods)
                 {
-                    return;
+                    if (m.Name == nameof(PlayerManager.TryAddToExistingStackable) && m.ReturnType == typeof(bool) && !m.IsGenericMethod && m.GetParameters().Length == 4)
+                    {
+                        return m;
+                    }
                 }
+                MelonLogger.Msg("PlayerManager.TryAddToExistingStackable not found for patch.");
+                return null;
+            }
+            internal static bool Prefix(ref GearItem gearToAdd, float normalizedCondition, int numUnits, out GearItem existingGearItem)
+            {
 
-                Implementation.SplitStack(gearItem);
-                Object.Destroy(gearItem.m_StackableItem);
-            }
-        }
+                existingGearItem = new GearItem();
 
-        [HarmonyPatch(typeof(GearItem), "DegradeOnUse")]
-        internal class GearItem_DegradeOnUse
-        {
-            private static void Prefix(GearItem __instance)
-            {
-                Implementation.SplitStack(__instance);
-            }
-            private static void Postfix(GearItem __instance)
-            {
-                Implementation.AddToExistingStack(__instance);
-            }
-        }
-
-        //???????????????????
-        [HarmonyPatch(typeof(PlayerManager), "InstantiateItemInPlayerInventory", new System.Type[] { typeof(GearItem), typeof(int) })]
-        internal class InstantiateItemInPlayerInventory
-        {
-            private static void Postfix(ref GearItem __result)
-            {
-                __result = null;
-            }
-        }
-
-        [HarmonyPatch(typeof(Lock), "OnForceLockComplete")]
-        internal class Lock_OnForceLockComplete
-        {
-            private static void Prefix(Lock __instance)
-            {
-                Implementation.SplitStack(__instance.m_GearUsedToForceLock);
-            }
-            private static void Postfix(Lock __instance)
-            {
-                Implementation.AddToExistingStack(__instance.m_GearUsedToForceLock);
-            }
-        }
-
-        [HarmonyPatch(typeof(Panel_Crafting), "DegradeTools")]
-        internal class Panel_Crafting_DegradeToolUsedForCrafting
-        {
-            private static void Prefix(Panel_Crafting __instance)
-            {
-                GearItem gearItem = __instance.m_RequirementContainer.GetSelectedTool()?.GetComponent<GearItem>();
-                Implementation.SplitStack(gearItem);
-            }
-            private static void Postfix(Panel_Crafting __instance)
-            {
-                GearItem gearItem = __instance.m_RequirementContainer.GetSelectedTool()?.GetComponent<GearItem>();
-                Implementation.AddToExistingStack(gearItem);
-            }
-        }
-
-        [HarmonyPatch(typeof(Panel_IceFishingHoleClear), "OnBreakIceComplete")]
-        internal class Panel_IceFishingHoleClear_OnBreakIceComplete
-        {
-            private static void Prefix(Panel_IceFishingHoleClear __instance)
-            {
-                Implementation.SplitStack(__instance.m_ToolUsed);
-            }
-            private static void Postfix(Panel_IceFishingHoleClear __instance)
-            {
-                Implementation.AddToExistingStack(__instance.m_ToolUsed);
-            }
-        }
-
-        [HarmonyPatch(typeof(Panel_Inventory_Examine), "RepairSuccessful")]
-        internal class Panel_Inventory_Examine_RepairSuccessful
-        {
-            private static void Prefix(Panel_Inventory_Examine __instance)
-            {
-                Implementation.Log("RepairSuccessful");
-                Implementation.SplitStack(__instance.m_GearItem);
-            }
-            private static void Postfix(Panel_Inventory_Examine __instance)
-            {
-                Implementation.AddToExistingStack(__instance.m_GearItem);
-            }
-        }
-
-        [HarmonyPatch(typeof(Panel_Inventory_Examine), "SharpenSuccessful")]
-        internal class Panel_Inventory_Examine_SharpenSuccessful
-        {
-            private static void Prefix(Panel_Inventory_Examine __instance)
-            {
-                Implementation.SplitStack(__instance.m_GearItem);
-            }
-            private static void Postfix(Panel_Inventory_Examine __instance)
-            {
-                Implementation.AddToExistingStack(__instance.m_GearItem);
-            }
-        }*/
-
-        [HarmonyPatch(typeof(PlayerManager), "AddToExistingStackable", new System.Type[] { typeof(string), typeof(float), typeof(int), typeof(GearItem) })]
-        internal class PlayerManager_AddToExistingStackable
-        {
-            private static bool Prefix(PlayerManager __instance, ref GearItem __result, string itemName, float normalizedCondition, int numUnits, GearItem gearToAdd)
-            {
                 if (normalizedCondition == 0)
                 {
-                    __result = null;
                     return false;
                 }
 
@@ -128,17 +46,53 @@ namespace BetterStacking
                     return true;
                 }
 
-                GearItem targetStack = GameManager.GetInventoryComponent().GetClosestMatchStackable(itemName, normalizedCondition);
+                GearItem targetStack = GameManager.GetInventoryComponent().GetClosestMatchStackable(gearToAdd.GearItemData, normalizedCondition);
+
                 if (!Implementation.CanBeMerged(targetStack, gearToAdd))
                 {
-                    __result = null;
                     return false;
                 }
 
-                Implementation.MergeIntoStack(normalizedCondition, numUnits, targetStack);
-                __result = targetStack;
+
+                if (targetStack.m_StackableItem != null)
+                {
+                    Implementation.MergeIntoStack(normalizedCondition, numUnits, targetStack, gearToAdd);
+                    existingGearItem = targetStack;
+                    return true;
+                }
+
                 return false;
+
             }
         }
+
+        [HarmonyPatch(typeof(ConsoleManager), nameof(ConsoleManager.CONSOLE_gear_add))]
+        internal class ConsoleManager_CONSOLE_gear_add
+        {
+            private static void Postfix()
+            {
+                // are we tracking a postfix patch ?
+                if (postfix_track)
+                {
+                    // correct the stack(s) conditions
+                    postfix_stack.CurrentHP = postfix_condition * postfix_stack.m_GearItemData.m_MaxHP;
+                    postfix_geartoadd.CurrentHP = postfix_condition * postfix_geartoadd.m_GearItemData.m_MaxHP;
+
+                    // reset the items constraints
+                    postfix_stack.m_StackableItem.m_StackConditionDifferenceConstraint = postfix_constraint;
+                    postfix_geartoadd.m_StackableItem.m_StackConditionDifferenceConstraint = postfix_constraint;
+
+                }
+
+                // reset the static values to avoid any conflicts
+                postfix_track = false;
+                postfix_condition = 0;
+                postfix_stack = new GearItem();
+                postfix_geartoadd = new GearItem();
+                postfix_constraint = 0;
+
+            }
+        }
+
     }
 }
