@@ -51,12 +51,7 @@ internal class Implementation : MelonMod
  
     internal static bool CanBeMerged(GearItem target, GearItem item)
     {
-        if (target is null || item is null)
-        {
-            return false;
-        }
-
-        return CanBeMerged(target.m_FlareItem, item.m_FlareItem);
+        return target != null && item != null && CanBeMerged(target.m_FlareItem, item.m_FlareItem);
     }
 
     internal static void Log(string message) => MelonLogger.Msg(message);
@@ -120,7 +115,7 @@ internal class Implementation : MelonMod
 
     internal static void SplitStack(GearItem gearItem)
     {
-        if (gearItem is null || gearItem.m_StackableItem is null)
+        if (gearItem == null || gearItem.m_StackableItem == null)
         {
             return;
         }
@@ -137,23 +132,13 @@ internal class Implementation : MelonMod
 
     internal static bool UseDefaultStacking(GearItem gearItem)
     {
-        if (gearItem is null)
-        {
-            return true;
-        }
-
-        if (STACK_MERGE.Contains(gearItem.name))
-        {
-            return false;
-        }
-
-        return true;
+        return gearItem == null || !STACK_MERGE.Contains(gearItem.name);
     }
 
 
     private static bool CanBeMerged(FlareItem target, FlareItem item)
     {
-        if (target is null || item is null)
+        if (target == null || item == null)
         {
             return true;
         }
