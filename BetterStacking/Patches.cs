@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Il2Cpp;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -180,43 +180,10 @@ namespace BetterStacking
             targetStack.CurrentHP = targetCondition * targetStack.m_GearItemData.m_MaxHP;
         }
 
-        internal static void SplitStack(GearItem gearItem)
-        {
-            if (gearItem == null || gearItem.m_StackableItem == null)
-            {
-                return;
-            }
-
-            try
-            {
-                SplitStackWithException(gearItem);
-            }
-            catch (Exception e)
-            {
-                Implementation.LogWarning("Failed to split stack of {gearItem.name}: {e}.");
-            }
-        }
-
-        internal static bool UseDefaultStacking(GearItem gearItem)
+        internal static bool UseDefaultStacking(GearItem? gearItem)
         {
             return gearItem == null || !STACK_MERGE.Contains(gearItem.name);
         }
 
-        private static void SplitStackWithException(GearItem gearItem)
-        {
-            int count = gearItem.m_StackableItem.m_Units;
-            if (count <= 1)
-            {
-                return;
-            }
-
-            gearItem.m_StackableItem.m_Units = 1;
-
-            GearItem clone = GearItem.InstantiateGearItem(gearItem.name);
-            clone.m_StackableItem.m_Units = count - 1;
-            clone.CurrentHP = gearItem.CurrentHP;
-
-            GameManager.GetInventoryComponent().AddGear(clone);
-        }
     }
 }
