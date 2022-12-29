@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2Cpp;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -45,22 +45,24 @@ namespace BetterStacking
 
             static MethodBase? TargetMethod()
             {
-                MethodInfo[] methods = typeof(PlayerManager).GetMethods();
-                foreach (MethodInfo m in methods)
+                MethodInfo? targetMethod = typeof(PlayerManager)
+                    .GetMethods()
+                    .FirstOrDefault(
+                        m => m.Name == nameof(PlayerManager.TryAddToExistingStackable)
+                        && m.ReturnType == typeof(bool)
+                        && !m.IsGenericMethod
+                        && m.GetParameters().Length == 4
+                        );
+                if (targetMethod is null)
                 {
-                    if (m.Name == nameof(PlayerManager.TryAddToExistingStackable) && m.ReturnType == typeof(bool) && !m.IsGenericMethod && m.GetParameters().Length == 4)
-                    {
-                        return m;
-                    }
+                    Implementation.LogWarning("PlayerManager.TryAddToExistingStackable not found for patch.");
                 }
-                Implementation.LogWarning("PlayerManager.TryAddToExistingStackable not found for patch.");
-                return null;
+
+                return targetMethod;
             }
 
-            internal static bool Prefix(ref GearItem gearToAdd, float normalizedCondition, int numUnits, out GearItem existingGearItem)
+            internal static bool Prefix(ref GearItem gearToAdd, float normalizedCondition, int numUnits, ref GearItem existingGearItem)
             {
-                existingGearItem = new GearItem();
-
                 if (normalizedCondition == 0)
                 {
                     return false;
