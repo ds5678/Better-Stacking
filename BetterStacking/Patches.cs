@@ -29,15 +29,15 @@ namespace BetterStacking
         "GEAR_WoodMatches",
         };
 
-        internal static bool PostFixTrack { get; private set; } = false;
+        private static bool PostFixTrack { get; set; } = false;
 
-        internal static float PostfixCondition { get; private set; } = 0;
+        private static float PostfixCondition { get; set; } = 0;
 
-        internal static GearItem? PostfixStack { get; private set; } = null;
+        private static GearItem? PostfixStack { get; set; } = null;
 
-        internal static GearItem? PostfixGearToAdd { get; private set; } = null;
+        private static GearItem? PostfixGearToAdd { get; set; } = null;
 
-        internal static float PostfixConstraint { get; private set; } = 0;
+        private static float PostfixConstraint { get; set; } = 0;
 
         [HarmonyPatch]
         internal static class PlayerManager_TryAddToExistingStackable
