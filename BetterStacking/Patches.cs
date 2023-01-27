@@ -61,33 +61,48 @@ namespace BetterStacking
                 return targetMethod;
             }
 
-            internal static bool Prefix(ref GearItem gearToAdd, float normalizedCondition, int numUnits, ref GearItem existingGearItem)
+            /// <summary>
+            /// <para>GearItem existingGearItem is an out parameter of the original method</para>
+            /// <para><em>(due to changes in how we apply the override logic, we no longer need to skip the original method)</em></para>
+            /// </summary>
+            /// <param name="gearToAdd"></param>
+            /// <param name="normalizedCondition"></param>
+            /// <param name="numUnits"></param>
+            /// <param name="existingGearItem"></param>
+            internal static void Prefix(GearItem gearToAdd, float normalizedCondition, int numUnits, ref GearItem existingGearItem)
             {
+
+                // if the item is ruined we (do nothing)
                 if (normalizedCondition == 0)
                 {
-                    return false;
+                    return;
                 }
 
+                // if we are not controlling this items stackablity (do nothing)
                 if (UseDefaultStacking(gearToAdd))
                 {
-                    return true;
+                    return;
                 }
 
+                // get the closest match stackable from player inventory
                 GearItem targetStack = GameManager.GetInventoryComponent().GetClosestMatchStackable(gearToAdd.GearItemData, normalizedCondition);
 
+                // if we can't merge this item/stack (do nothing)
                 if (!CanBeMerged(targetStack, gearToAdd))
                 {
-                    return false;
+                    return;
                 }
 
+                // if the item is stackable perform the merge changed
                 if (targetStack.m_StackableItem != null)
                 {
+                    // perform merge override logic
                     MergeIntoStack(normalizedCondition, numUnits, targetStack, gearToAdd);
+                    // set the existingGearItem to our targetStack
                     existingGearItem = targetStack;
-                    return true;
+                    return;
                 }
 
-                return false;
             }
 
         }
@@ -159,6 +174,8 @@ namespace BetterStacking
                     normalizedCondition = gearToAdd.GetNormalizedCondition();
                 }
             }
+
+            //Implementation.Log("Merging " + gearToAdd.name + "(qty:" + numUnits + ") (cond:"+ normalizedCondition + ") into " + targetStack.name+" (cond:"+ targetStack.GetNormalizedCondition() + ")");
 
             int targetCount = numUnits + targetStack.m_StackableItem.m_Units;
             float targetCondition = (numUnits * normalizedCondition + targetStack.m_StackableItem.m_Units * targetStack.GetNormalizedCondition()) / targetCount;
