@@ -116,14 +116,20 @@ namespace BetterStacking
                 // are we tracking a postfix patch ?
                 if (PostFixTrack)
                 {
-                    // correct the stack(s) conditions
-                    PostfixStack.CurrentHP = PostfixCondition * PostfixStack.m_GearItemData.m_MaxHP;
-                    PostfixGearToAdd.CurrentHP = PostfixCondition * PostfixGearToAdd.m_GearItemData.m_MaxHP;
-
-                    // reset the items constraints
-                    PostfixStack.m_StackableItem.m_StackConditionDifferenceConstraint = PostfixConstraint;
-                    PostfixGearToAdd.m_StackableItem.m_StackConditionDifferenceConstraint = PostfixConstraint;
-
+                    if (PostfixStack != null)
+                    {
+                        // correct the stack(s) conditions
+                        PostfixStack.CurrentHP = PostfixCondition * PostfixStack.m_GearItemData.m_MaxHP;
+                        // reset the items constraints
+                        PostfixStack.m_StackableItem.m_StackConditionDifferenceConstraint = PostfixConstraint;
+                    }
+                    if (PostfixGearToAdd != null)
+                    {
+                        // correct the stack(s) conditions
+                        PostfixGearToAdd.CurrentHP = PostfixCondition * PostfixGearToAdd.m_GearItemData.m_MaxHP;
+                        // reset the items constraints
+                        PostfixGearToAdd.m_StackableItem.m_StackConditionDifferenceConstraint = PostfixConstraint;
+                    }
                 }
 
                 // reset the static values to avoid any conflicts
