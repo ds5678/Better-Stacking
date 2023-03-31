@@ -69,7 +69,7 @@ namespace BetterStacking
             /// <param name="normalizedCondition"></param>
             /// <param name="numUnits"></param>
             /// <param name="existingGearItem"></param>
-            internal static void Prefix(GearItem gearToAdd, float normalizedCondition, int numUnits, ref GearItem existingGearItem)
+            internal static void Prefix(GearItem gearToAdd, float normalizedCondition, int numUnits, ref GearItem? existingGearItem, ref bool __runOriginal)
             {
 
                 // if the item is ruined we (do nothing)
@@ -85,13 +85,21 @@ namespace BetterStacking
                 }
 
                 // get the closest match stackable from player inventory
-                GearItem targetStack = GameManager.GetInventoryComponent().GetClosestMatchStackable(gearToAdd.GearItemData, normalizedCondition);
+                GearItem targetStack = StackableItem.GetClosestMatchStackable(GameManager.GetInventoryComponent().m_Items, gearToAdd, normalizedCondition);
 
                 // if we can't merge this item/stack (do nothing)
                 if (!CanBeMerged(targetStack, gearToAdd))
                 {
                     return;
                 }
+
+				//patch for lit matches breaking the stacks
+				if (gearToAdd.IsLitMatch() || targetStack.IsLitMatch())
+				{
+					__runOriginal = false;
+					existingGearItem = null;
+				}
+
 
                 // if the item is stackable perform the merge changed
                 if (targetStack.m_StackableItem != null)
